@@ -138,4 +138,5 @@ class ClubSpider(scrapy.Spider):
                     self.browser.find_element_by_xpath('//*[@id="mainContent"]/div[2]/div/section/div[1]/div[2]').click()
                     time.sleep(3)
                     self.browser.find_element_by_xpath('//*[@id="mainContent"]/div[2]/div/section/div[1]/ul/li'+str([i])).click()
+                    
             self.browser.find_element_by_xpath('/html/body/header/div/nav/ul/li[8]/a').click()
