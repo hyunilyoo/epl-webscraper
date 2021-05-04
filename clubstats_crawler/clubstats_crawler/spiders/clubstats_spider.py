@@ -4,6 +4,37 @@ from selenium import webdriver
 from scrapy.selector import Selector
 from clubstats_crawler.items import ClubstatsCrawlerItem
 
+def getting_items(k, browser, selector):
+    selector = selector
+    browser.find_element_by_xpath('//*[@id="mainContent"]/div[3]/div/div/section/div[1]/div[2]').click()
+    time.sleep(3)
+    print('checkpoint 1')
+
+    browser.find_element_by_xpath('//*[@id="mainContent"]/div[3]/div/div/section/div[1]/ul/li'+f'{k}').click()
+    time.sleep(5)
+    print('checkpoint 2')
+
+    html = browser.find_element_by_xpath('//*').get_attribute('outerHTML')
+    selector = Selector(text=html)
+
+    item = ClubstatsCrawlerItem()
+    item["club_name"] = selector.xpath('//*[@id="mainContent"]/header/div[2]/div/div/div[2]/h1/text()')[0].extract()
+    item["goal_per_match"] = selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[1]/div/div[3]/span/span/text()')[0].extract()
+    item["shot_on_target"] = selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[1]/div/div[5]/span/span/text()')[0].extract()
+    item["shooting_accuracy"] = selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[1]/div/div[6]/span/span/text()')[0].extract()
+    item["big_chance_created"] = selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[1]/div/div[8]/span/span/text()')[0].extract()
+    item["pass_per_game"] = selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[2]/div/div[3]/span/span/text()')[0].extract()
+    item["pass_accuracy"] = selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[2]/div/div[4]/span/span/text()')[0].extract()
+    item["cross"] = selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[2]/div/div[5]/span/span/text()')[0].extract()
+    item["cross_accuracy"] = selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[2]/div/div[6]/span/span/text()')[0].extract()
+    item["goal_conceded_per_match"] = selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[3]/div/div[4]/span/span/text()')[0].extract()
+    item["tackle_success"] = selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[3]/div/div[7]/span/span/text()')[0].extract()
+    item["clearance"] = selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[3]/div/div[10]/span/span/text()')[0].extract()
+    item["aerial_battles"] = selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[3]/div/div[12]/span/span/text()')[0].extract()
+    item["interceptions"] = selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[3]/div/div[9]/span/span/text()')[0].extract()
+    item["season"] = selector.xpath('//*[@id="mainContent"]/div[3]/div/div/section/div[1]/div[2]/text()')[0].extract()
+        
+    yield item
 
 class ClubSpider(scrapy.Spider):
     name = "Clubstats"
@@ -14,35 +45,6 @@ class ClubSpider(scrapy.Spider):
         scrapy.Spider.__init__(self)
         self.browser = webdriver.Chrome("/Users/hyunilyoo/Documents/analytics/chromedriver")
     
-    def items(self, k):
-        self.browser.find_element_by_xpath('//*[@id="mainContent"]/div[3]/div/div/section/div[1]/div[2]').click()
-        time.sleep(3)
-
-        self.browser.find_element_by_xpath('//*[@id="mainContent"]/div[3]/div/div/section/div[1]/ul/li'+str([k])).click()
-        time.sleep(5)
-
-        html = self.browser.find_element_by_xpath('//*').get_attribute('outerHTML')
-        selector = Selector(text=html)
-
-        item = ClubstatsCrawlerItem()
-        item["club_name"] = selector.xpath('//*[@id="mainContent"]/header/div[2]/div/div/div[2]/h1/text()')[0].extract()
-        item["goal_per_match"] = selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[1]/div/div[3]/span/span/text()')[0].extract()
-        item["shot_on_target"] = selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[1]/div/div[5]/span/span/text()')[0].extract()
-        item["shooting_accuracy"] = selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[1]/div/div[6]/span/span/text()')[0].extract()
-        item["big_chance_created"] = selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[1]/div/div[8]/span/span/text()')[0].extract()
-        item["pass_per_game"] = selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[2]/div/div[3]/span/span/text()')[0].extract()
-        item["pass_accuracy"] = selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[2]/div/div[4]/span/span/text()')[0].extract()
-        item["cross"] = selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[2]/div/div[5]/span/span/text()')[0].extract()
-        item["cross_accuracy"] = selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[2]/div/div[6]/span/span/text()')[0].extract()
-        item["goal_conceded_per_match"] = selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[3]/div/div[4]/span/span/text()')[0].extract()
-        item["tackle_success"] = selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[3]/div/div[7]/span/span/text()')[0].extract()
-        item["clearance"] = selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[3]/div/div[10]/span/span/text()')[0].extract()
-        item["aerial_battles"] = selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[3]/div/div[12]/span/span/text()')[0].extract()
-        item["interceptions"] = selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[3]/div/div[9]/span/span/text()')[0].extract()
-        item["season"] = selector.xpath('//*[@id="mainContent"]/div[3]/div/div/section/div[1]/div[2]/text()')[0].extract()
-        
-        yield item
-
     def parse(self, response):
         self.browser.get(response.url)
         time.sleep(5)
@@ -52,11 +54,15 @@ class ClubSpider(scrapy.Spider):
         name = None
         season_count = None
 
+        # Number of seasons
         for i in range(1, 29):
             time.sleep(3)
+            # Filter by Season
             self.browser.find_element_by_xpath('//*[@id="mainContent"]/div[2]/div/section/div[1]/div[2]').click()
             time.sleep(3)
+            # Seasons in the dropdown menu
             self.browser.find_element_by_xpath('//*[@id="mainContent"]/div[2]/div/section/div[1]/ul/li'+str([i])).click()
+            # Number of teams
             for j in range(1, 21):
                 time.sleep(3)
                 html = self.browser.find_element_by_xpath('//*').get_attribute('outerHTML')
@@ -77,13 +83,13 @@ class ClubSpider(scrapy.Spider):
                     for k in range(2, season_count):
                         # This is for scrolling down the dropdown menu
                         if k < 10:
-                            ClubSpider().items(k)
+                            getting_items(k, self.browser, selector)
 
                         elif k >= 10 and k < 19:
-                            ClubSpider().items(k)
+                            getting_items(k, self.browser, selector)
 
                         elif k >= 19:
-                            ClubSpider().items(k)
+                            getting_items(k, self.browser, selector)
 
                     self.browser.find_element_by_xpath('/html/body/header/div/nav/ul/li[8]/a').click()
                     time.sleep(3)
