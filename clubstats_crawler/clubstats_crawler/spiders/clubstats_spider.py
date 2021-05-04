@@ -4,18 +4,7 @@ from selenium import webdriver
 from scrapy.selector import Selector
 from clubstats_crawler.items import ClubstatsCrawlerItem
 
-def getting_items(k, browser, selector):
-    selector = selector
-    browser.find_element_by_xpath('//*[@id="mainContent"]/div[3]/div/div/section/div[1]/div[2]').click()
-    time.sleep(3)
-    print('checkpoint 1')
-
-    browser.find_element_by_xpath('//*[@id="mainContent"]/div[3]/div/div/section/div[1]/ul/li'+f'{k}').click()
-    time.sleep(5)
-    print('checkpoint 2')
-
-    html = browser.find_element_by_xpath('//*').get_attribute('outerHTML')
-    selector = Selector(text=html)
+def getting_items(selector):
 
     item = ClubstatsCrawlerItem()
     item["club_name"] = selector.xpath('//*[@id="mainContent"]/header/div[2]/div/div/div[2]/h1/text()')[0].extract()
@@ -33,8 +22,83 @@ def getting_items(k, browser, selector):
     item["aerial_battles"] = selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[3]/div/div[12]/span/span/text()')[0].extract()
     item["interceptions"] = selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[3]/div/div[9]/span/span/text()')[0].extract()
     item["season"] = selector.xpath('//*[@id="mainContent"]/div[3]/div/div/section/div[1]/div[2]/text()')[0].extract()
-        
+
     yield item
+
+def navigate_to_club(browser, response):
+    browser.get(response.url)
+    time.sleep(5)
+    html = browser.find_element_by_xpath('//*').get_attribute('outerHTML')
+    selector = Selector(text=html)
+    clubnames = []
+    name = None
+    season_count = None
+
+    for i in range(1, 2):
+        time.sleep(3)
+
+        # Filter by Season
+        browser.find_element_by_xpath('//*[@id="mainContent"]/div[2]/div/section/div[1]/div[2]').click()
+        time.sleep(3)
+
+        # Seasons in the dropdown menu
+        browser.find_element_by_xpath('//*[@id="mainContent"]/div[2]/div/section/div[1]/ul/li'+str([i])).click()
+
+        # Number of teams
+        for j in range(1, 2):
+            time.sleep(3)
+            html = browser.find_element_by_xpath('//*').get_attribute('outerHTML')
+            selector = Selector(text=html)
+            name = selector.xpath('//*[@id="mainContent"]/div[2]/div/div/div[1]/div/ul/li'+str([j])+'/a/div[3]/div[2]/h4/text()')[0].extract()
+            if name not in clubnames:
+                clubnames.append(name)
+
+                # Into Club
+                browser.find_element_by_xpath('//*[@id="mainContent"]/div[2]/div/div/div[1]/div/ul/li'+str([j])+'/a/div[3]/div[3]/span').click()
+                time.sleep(3)
+
+                # navigate to stats
+                browser.find_element_by_xpath('//*[@id="mainContent"]/nav/ul/li[5]/a').click()
+                time.sleep(3)
+
+                html = browser.find_element_by_xpath('//*').get_attribute('outerHTML')
+                selector = Selector(text=html)
+                season_count = len(selector.xpath('//*[@id="mainContent"]/div[3]/div/div/section/div[1]/ul/li'))+1
+
+                # navigate to dropdown menu for seasons`
+                for k in range(2, 3):
+                    # This is for scrolling down the dropdown menu
+                    if k < 10:
+                        browser.find_element_by_xpath('//*[@id="mainContent"]/div[3]/div/div/section/div[1]/div[2]').click()
+                        time.sleep(3)
+                        browser.find_element_by_xpath('//*[@id="mainContent"]/div[3]/div/div/section/div[1]/ul/li'+f'[{k}]').click()
+                        time.sleep(3)
+                        html = browser.find_element_by_xpath('//*').get_attribute('outerHTML')
+                        selector = Selector(text=html)
+                        getting_items(selector)
+
+                    elif k >= 10 and k < 19:
+                        browser.find_element_by_xpath('//*[@id="mainContent"]/div[3]/div/div/section/div[1]/div[2]').click()
+                        time.sleep(3)
+                        browser.execute_script('window.scrollTo(0, 150')
+                        time.sleep(3)
+                        browser.find_element_by_xpath('//*[@id="mainContent"]/div[3]/div/div/section/div[1]/ul/li'+f'[{k}]').click()
+                        time.sleep(3)
+                        html = browser.find_element_by_xpath('//*').get_attribute('outerHTML')
+                        selector = Selector(text=html)
+                        getting_items(selector)
+
+                    elif k >= 19:
+                        browser.find_element_by_xpath('//*[@id="mainContent"]/div[3]/div/div/section/div[1]/div[2]').click()
+                        time.sleep(3)
+                        browser.execute_script('window.scrollTo(0, 330')
+                        time.sleep(3)
+                        browser.find_element_by_xpath('//*[@id="mainContent"]/div[3]/div/div/section/div[1]/ul/li'+f'[{k}]').click()
+                        time.sleep(3)
+                        html = browser.find_element_by_xpath('//*').get_attribute('outerHTML')
+                        selector = Selector(text=html)
+                        getting_items(selector)
+
 
 class ClubSpider(scrapy.Spider):
     name = "Clubstats"
@@ -44,57 +108,8 @@ class ClubSpider(scrapy.Spider):
     def __init__(self):
         scrapy.Spider.__init__(self)
         self.browser = webdriver.Chrome("/Users/hyunilyoo/Documents/analytics/chromedriver")
-    
+
     def parse(self, response):
-        self.browser.get(response.url)
-        time.sleep(5)
-        html = self.browser.find_element_by_xpath('//*').get_attribute('outerHTML')
-        selector = Selector(text=html)
-        clubnames = []
-        name = None
-        season_count = None
+        navigate_to_club(self.browser, response)
 
-        # Number of seasons
-        for i in range(1, 29):
-            time.sleep(3)
-            # Filter by Season
-            self.browser.find_element_by_xpath('//*[@id="mainContent"]/div[2]/div/section/div[1]/div[2]').click()
-            time.sleep(3)
-            # Seasons in the dropdown menu
-            self.browser.find_element_by_xpath('//*[@id="mainContent"]/div[2]/div/section/div[1]/ul/li'+str([i])).click()
-            # Number of teams
-            for j in range(1, 21):
-                time.sleep(3)
-                html = self.browser.find_element_by_xpath('//*').get_attribute('outerHTML')
-                selector = Selector(text=html)
-                name = selector.xpath('//*[@id="mainContent"]/div[2]/div/div/div[1]/div/ul/li'+str([j])+'/a/div[3]/div[2]/h4/text()')[0].extract()
-                if name not in clubnames:
-                    clubnames.append(name)
-                    # Into Club
-                    self.browser.find_element_by_xpath('//*[@id="mainContent"]/div[2]/div/div/div[1]/div/ul/li'+str([j])+'/a/div[3]/div[3]/span').click()
-                    time.sleep(3)
-                    # navigate to stats
-                    self.browser.find_element_by_xpath('//*[@id="mainContent"]/nav/ul/li[5]/a').click()
-                    time.sleep(3)
-                    html = self.browser.find_element_by_xpath('//*').get_attribute('outerHTML')
-                    selector = Selector(text=html)
-                    season_count = len(selector.xpath('//*[@id="mainContent"]/div[3]/div/div/section/div[1]/ul/li'))+1
-                    # navigate to dropdown menu for seasons`
-                    for k in range(2, season_count):
-                        # This is for scrolling down the dropdown menu
-                        if k < 10:
-                            getting_items(k, self.browser, selector)
 
-                        elif k >= 10 and k < 19:
-                            getting_items(k, self.browser, selector)
-
-                        elif k >= 19:
-                            getting_items(k, self.browser, selector)
-
-                    self.browser.find_element_by_xpath('/html/body/header/div/nav/ul/li[8]/a').click()
-                    time.sleep(3)
-                    self.browser.find_element_by_xpath('//*[@id="mainContent"]/div[2]/div/section/div[1]/div[2]').click()
-                    time.sleep(3)
-                    self.browser.find_element_by_xpath('//*[@id="mainContent"]/div[2]/div/section/div[1]/ul/li'+str([i])).click()
-                    
-            self.browser.find_element_by_xpath('/html/body/header/div/nav/ul/li[8]/a').click()
