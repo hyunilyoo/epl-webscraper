@@ -12,7 +12,7 @@ class ClubSpider(scrapy.Spider):
 
     def __init__(self):
         scrapy.Spider.__init__(self)
-        self.browser = webdriver.Chrome("C:\sta\chromedriver.exe")
+        self.browser = webdriver.Chrome("/Users/hyunilyoo/Documents/analytics/chromedriver")
 
     def parse(self, response):
         self.browser.get(response.url)
