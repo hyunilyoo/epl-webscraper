@@ -56,78 +56,49 @@ class ClubSpider(scrapy.Spider):
                     self.season_club = len(self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/section/div[1]/ul/li'))+1
 
                     # navigate to dropdown menu for seasons in the club
-                    for k in range(2, 3):
+                    for k in range(2, self.season_club):
                         self.browser.find_element_by_xpath('//*[@id="mainContent"]/div[3]/div/div/section/div[1]/div[2]').click()
                         time.sleep(3)
-                        self.browser.find_element_by_xpath('//*[@id="mainContent"]/div[3]/div/div/section/div[1]/ul/li'+f'[{k}]').click()
-                        time.sleep(5)
-                        if k < 10:
-                            self.html = self.browser.find_element_by_xpath('//*').get_attribute('outerHTML')
-                            self.selector = Selector(text=self.html)
 
-                            self.item = ClubstatsCrawlerItem()
-                            self.item["club_name"] = self.selector.xpath('//*[@id="mainContent"]/header/div[2]/div/div/div[2]/h1/text()')[0].extract()
-                            self.item["goal_per_match"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[1]/div/div[3]/span/span/text()')[0].extract()
-                            self.item["shot_on_target"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[1]/div/div[5]/span/span/text()')[0].extract()
-                            self.item["shooting_accuracy"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[1]/div/div[6]/span/span/text()')[0].extract()
-                            self.item["big_chance_created"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[1]/div/div[8]/span/span/text()')[0].extract()
-                            self.item["pass_per_game"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[2]/div/div[3]/span/span/text()')[0].extract()
-                            self.item["pass_accuracy"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[2]/div/div[4]/span/span/text()')[0].extract()
-                            self.item["cross"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[2]/div/div[5]/span/span/text()')[0].extract()
-                            self.item["cross_accuracy"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[2]/div/div[6]/span/span/text()')[0].extract()
-                            self.item["goal_conceded_per_match"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[3]/div/div[4]/span/span/text()')[0].extract()
-                            self.item["tackle_success"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[3]/div/div[7]/span/span/text()')[0].extract()
-                            self.item["clearance"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[3]/div/div[10]/span/span/text()')[0].extract()
-                            self.item["aerial_battles"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[3]/div/div[12]/span/span/text()')[0].extract()
-                            self.item["interceptions"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[3]/div/div[9]/span/span/text()')[0].extract()
-                            self.item["season"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/section/div[1]/div[2]/text()')[0].extract()
-                            yield self.item
+                        if k < 10:
+                            self.browser.find_element_by_xpath('//*[@id="mainContent"]/div[3]/div/div/section/div[1]/ul/li'+f'[{k}]').click()
+                            time.sleep(5)
 
                         elif k >= 10 and k < 19:
                             self.browser.execute_script('window.scrollTo(0, 150)')
                             time.sleep(3)
+                            self.browser.find_element_by_xpath('//*[@id="mainContent"]/div[3]/div/div/section/div[1]/ul/li'+f'[{k}]').click()
+                            time.sleep(5)
 
-                            self.item = ClubstatsCrawlerItem()
-                            self.item["club_name"] = self.selector.xpath('//*[@id="mainContent"]/header/div[2]/div/div/div[2]/h1/text()')[0].extract()
-                            self.item["goal_per_match"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[1]/div/div[3]/span/span/text()')[0].extract()
-                            self.item["shot_on_target"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[1]/div/div[5]/span/span/text()')[0].extract()
-                            self.item["shooting_accuracy"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[1]/div/div[6]/span/span/text()')[0].extract()
-                            self.item["big_chance_created"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[1]/div/div[8]/span/span/text()')[0].extract()
-                            self.item["pass_per_game"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[2]/div/div[3]/span/span/text()')[0].extract()
-                            self.item["pass_accuracy"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[2]/div/div[4]/span/span/text()')[0].extract()
-                            self.item["cross"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[2]/div/div[5]/span/span/text()')[0].extract()
-                            self.item["cross_accuracy"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[2]/div/div[6]/span/span/text()')[0].extract()
-                            self.item["goal_conceded_per_match"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[3]/div/div[4]/span/span/text()')[0].extract()
-                            self.item["tackle_success"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[3]/div/div[7]/span/span/text()')[0].extract()
-                            self.item["clearance"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[3]/div/div[10]/span/span/text()')[0].extract()
-                            self.item["aerial_battles"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[3]/div/div[12]/span/span/text()')[0].extract()
-                            self.item["interceptions"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[3]/div/div[9]/span/span/text()')[0].extract()
-                            self.item["season"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/section/div[1]/div[2]/text()')[0].extract()
-                            yield self.item
-
-                        elif k >= 19:
+                        else:
                             self.browser.execute_script('window.scrollTo(0, 330)')
                             time.sleep(3)
+                            self.browser.find_element_by_xpath('//*[@id="mainContent"]/div[3]/div/div/section/div[1]/ul/li'+f'[{k}]').click()
+                            time.sleep(5)
 
-                            self.item = ClubstatsCrawlerItem()
-                            self.item["club_name"] = self.selector.xpath('//*[@id="mainContent"]/header/div[2]/div/div/div[2]/h1/text()')[0].extract()
-                            self.item["goal_per_match"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[1]/div/div[3]/span/span/text()')[0].extract()
-                            self.item["shot_on_target"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[1]/div/div[5]/span/span/text()')[0].extract()
-                            self.item["shooting_accuracy"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[1]/div/div[6]/span/span/text()')[0].extract()
-                            self.item["big_chance_created"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[1]/div/div[8]/span/span/text()')[0].extract()
-                            self.item["pass_per_game"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[2]/div/div[3]/span/span/text()')[0].extract()
-                            self.item["pass_accuracy"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[2]/div/div[4]/span/span/text()')[0].extract()
-                            self.item["cross"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[2]/div/div[5]/span/span/text()')[0].extract()
-                            self.item["cross_accuracy"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[2]/div/div[6]/span/span/text()')[0].extract()
-                            self.item["goal_conceded_per_match"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[3]/div/div[4]/span/span/text()')[0].extract()
-                            self.item["tackle_success"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[3]/div/div[7]/span/span/text()')[0].extract()
-                            self.item["clearance"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[3]/div/div[10]/span/span/text()')[0].extract()
-                            self.item["aerial_battles"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[3]/div/div[12]/span/span/text()')[0].extract()
-                            self.item["interceptions"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[3]/div/div[9]/span/span/text()')[0].extract()
-                            self.item["season"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/section/div[1]/div[2]/text()')[0].extract()
-                            yield self.item
+                        self.html = self.browser.find_element_by_xpath('//*').get_attribute('outerHTML')
+                        self.selector = Selector(text=self.html)
+
+                        self.item = ClubstatsCrawlerItem()
+                        self.item["club_name"] = self.selector.xpath('//*[@id="mainContent"]/header/div[2]/div/div/div[2]/h1/text()')[0].extract()
+                        self.item["goal_per_match"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[1]/div/div[3]/span/span/text()')[0].extract()
+                        self.item["shot_on_target"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[1]/div/div[5]/span/span/text()')[0].extract()
+                        self.item["shooting_accuracy"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[1]/div/div[6]/span/span/text()')[0].extract()
+                        self.item["big_chance_created"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[1]/div/div[8]/span/span/text()')[0].extract()
+                        self.item["pass_per_game"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[2]/div/div[3]/span/span/text()')[0].extract()
+                        self.item["pass_accuracy"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[2]/div/div[4]/span/span/text()')[0].extract()
+                        self.item["cross"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[2]/div/div[5]/span/span/text()')[0].extract()
+                        self.item["cross_accuracy"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[2]/div/div[6]/span/span/text()')[0].extract()
+                        self.item["goal_conceded_per_match"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[3]/div/div[4]/span/span/text()')[0].extract()
+                        self.item["tackle_success"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[3]/div/div[7]/span/span/text()')[0].extract()
+                        self.item["clearance"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[3]/div/div[10]/span/span/text()')[0].extract()
+                        self.item["aerial_battles"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[3]/div/div[12]/span/span/text()')[0].extract()
+                        self.item["interceptions"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/ul/li[3]/div/div[9]/span/span/text()')[0].extract()
+                        self.item["season"] = self.selector.xpath('//*[@id="mainContent"]/div[3]/div/div/section/div[1]/div[2]/text()')[0].extract()
+                        yield self.item
 
                     # Back to the request url
                     self.browser.get(response.url)
 
+        self.browser.quit()
 
