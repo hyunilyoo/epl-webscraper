@@ -2,7 +2,7 @@
 ## How to use
 ### Crawler for Club statistics
 - Use `clubstats_spider.py` in `clubstats_crawler/spiders/`
-- e.g. `scrapy crawl Clubstats`  
+- e.g. `scrapy crawl Clubstats -o [filename].csv`  
 - output: `clubstats.csv` in `clubstats_crawler/spiders/`
 
 This will get every club statistics for every season such as:  
@@ -24,7 +24,7 @@ This will get every club statistics for every season such as:
 ```
 ### Crawler for Table info 
 - Use `tables_spider.py` in `tables_crawler/spiders/`
-- e.g. `scrapy crawl Tables`  
+- e.g. `scrapy crawl Tables -o [filename].csv`  
 - output: `tables.csv` in `tables_crawler/spiders`
 
 This will get every club statistics for every season such as:  
